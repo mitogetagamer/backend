@@ -1,0 +1,12 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "\"este proyecto se hace con el fin de empezar a manejar el backend\"",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "/test"
+  },
+  "author": "David Santiago Niño",
+  "license": "ISC"
+}
