@@ -1,61 +1,105 @@
+import bcrypt from "bcryptjs";
+import modelo from "../modelos/modelo.js";
 const ControladorUsuarios = {
- 
-  crearUsuario:async (solicitud, respuesta) => {
-      
-        try{
-          console.log("solicitud body", solicitud.body);
-          if (solicitud.body.nombre === "") throw new Error("falta el nombre");
-          if (solicitud.body.email === "") throw new Error("falta el email");
-          if (solicitud.body.username === "") throw new Error("falta el user");
-          if (solicitud.body.contrasenia === "") throw new Error("la contraseña es incorrecta o no fue digitada");
-          if (solicitud.body.cpassword === ""  )throw new Error("las contraseñas no coinciden o no fueron digitadas");
-          respuesta.json({mensaje: "POST usuario works!"});}
-          catch(error) {respuesta.json({error: true,mensaje: "ocurrio un error "})
-           
-          }
+  crearUsuario: async (solicitud, respuesta) => {
+    try {
+      const { nombre, email, contrasenia } = solicitud.body;
+      const contraseniaProtegida = await bcrypt.hash(contrasenia, 10);
+      const nuevoUser = new modelo({
+        nombre,
+        email,
+        contrasenia: contraseniaProtegida,
+      });
+      const Usercreted = await nuevoUser.save();
 
-      
+      console.log("solicitud body", solicitud.body);
+      if (Usercreted._id) {
+        respuesta.json({
+          resultado: "Bien",
+          mensaje: ".. Creando Usuario..",
+          datos: null,
+          //id: Usercreted._id,
+        });
+      }
+    } catch (error) {
+      respuesta.json({ error: true, mensaje: "ocurrio un error " });
+    }
   },
-      leerUsuario: async (solicitud, respuesta) => {
-        try {
-          console.log(solicitud.params.id);
-          respuesta.json({mensaje: "GET usuario work!"});
-        } catch (error) {
-          console.log("error",error);
-          respuesta.json({error:true, mensaje:"Se complica"});
-        }
-        
-      },
-      leerUsuarios:async (solicitud, respuesta) => {
-        try {
-          respuesta.json({mensaje: "GET usuarios works!"});
-        } catch (error) {
-          respuesta.json({error:true, mensaje:"Se complica"});
-        }
-        
-      },
-      actualizarUsuario:async (solicitud, respuesta) => {
-      try {
-        console.log("id: ",solicitud.params.id);
-        console.log("solicitud body: ",solicitud.body);
-        respuesta.json({mensaje: "PUT Actualizar usuario works!"});
-      } catch (error) {
-        respuesta.json({error:true, mensaje:"Se complica"});
+  leerUsuario: async (solicitud, respuesta) => {
+    try {
+      const UserFound = await modelo.findById(solicitud.params.id);
+      if (UserFound._id) {
+        respuesta.json({
+          resultado: "bien",
+          mensaje: "El dato fue leido correctamente",
+          datos: UserFound,
+        });
       }
-      },
-      eliminarUsuario: async(solicitud, respuesta) => {
-        try {
-          console.log("id: ", solicitud.params.id);
-          respuesta.json({mensaje: "Delete eliminar usuario works"})
-        } catch (error) {
-          console.log("error: ", error);
-          respuesta.json({error:true, mensaje: "DELETE usuario works!"});
-        }
-       
+    } catch (error) {
+      respuesta.json({
+        resultado: "Mal",
+        mensaje: "El dato fue no pudo ser leido correctamente",
+      });
+    }
+  },
+  leerUsuarios: async (solicitud, respuesta) => {
+    try {
+      const UsersFound = await modelo.find();
+      if (UsersFound) {
+        respuesta.json({
+          resultado: "bien",
+          mensaje: "Usuarios leidos correctamente",
+          datos: UsersFound,
+        });
       }
-      
-      
-}
+    } catch (error) {
+      respuesta.json({
+        resultado: "Mal",
+        mensaje: "Los datos  no pudieron ser leidos correctamente",
+        datos: "Error",
+      });
+    }
+  },
+  actualizarUsuario: async (solicitud, respuesta) => {
+    try {
+      const Actualizar = await modelo.findByIdAndUpdate(
+        solicitud.params.id,
+        solicitud.body
+      );
+      if (Actualizar._id) {
+        respuesta.json({
+          resultado: "bien",
+          mensaje: "El dato fue  actualizado correctamente",
+          datos: Actualizar._id,
+        });
+      }
+    } catch (error) {
+      respuesta.json({
+        resultado: "Mal",
+        mensaje: "El dato fue no pudo ser actualizado correctamente",
+        datos: "error",
+      });
+    }
+  },
+  eliminarUsuario: async (solicitud, respuesta) => {
+    try {
+      const Eliminar = await modelo.findByIdAndDelete(solicitud.params.id);
+      if (Eliminar._id) {
+        respuesta.json({
+          resultado: "bien",
+          mensaje: "El dato fue  eliminado correctamente",
+          datos: null,
+        });
+      }
+    } catch (error) {
+      respuesta.json({
+        resultado: "Mal",
+        mensaje: "El dato fue no pudo ser leido correctamente",
+        datos: "error",
+      });
+    }
+  },
+};
 
 export default ControladorUsuarios;
 
