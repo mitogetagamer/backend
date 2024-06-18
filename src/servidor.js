@@ -4,6 +4,7 @@ import enrutadorUsuarios from "./rutas/rutas.js";
 import morgan from "morgan";
 import cors from "cors";
 import rutasInicio from "./rutas/rutasInicio.js";
+import rutaCupcakes from "./rutas/rutaCupcakes.js";
 const servidor = express();
 servidor.use(morgan("dev"));
 servidor.use(cors());
@@ -11,6 +12,7 @@ servidor.use(express.json());
 // La parte entre comillas va a ser la ruta que se le asigna en el servidor
 servidor.use("/usuarios", enrutadorUsuarios);
 servidor.use("/inicio-sesion", rutasInicio);
+servidor.use("/Lanzamientos", rutaCupcakes);
 
 servidor.get("/", (solicitud, respuesta) => {
   respuesta.status(404).send("No encontrado");
