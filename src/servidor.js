@@ -5,6 +5,8 @@ import morgan from "morgan";
 import cors from "cors";
 import rutasInicio from "./rutas/rutasInicio.js";
 import rutaCupcakes from "./rutas/rutaCupcakes.js";
+import rutaEnvios from "./rutas/rutaEnvios.js";
+import path from "path";
 const servidor = express();
 servidor.use(morgan("dev"));
 servidor.use(cors());
@@ -13,6 +15,8 @@ servidor.use(express.json());
 servidor.use("/usuarios", enrutadorUsuarios);
 servidor.use("/inicio-sesion", rutasInicio);
 servidor.use("/Lanzamientos", rutaCupcakes);
+servidor.use("/imagenes", express.static(path.resolve("imagenes")));
+servidor.use("/envios", rutaEnvios);
 
 servidor.get("/", (solicitud, respuesta) => {
   respuesta.status(404).send("No encontrado");

@@ -1,6 +1,6 @@
 import multer from "multer";
 import modeloCupcakes from "../modelos/modeloCupcakes.js";
-
+import fs from "fs-extra";
 const controladorCupcakes = {
   crearMapcake: async (solicitud, respuesta) => {
     try {
@@ -16,8 +16,8 @@ const controladorCupcakes = {
       carga(solicitud, respuesta, async (error) => {
         if (error) {
           respuesta.json({
-            resultado: "bien",
-            mensaje: "Mapcake  creado",
+            resultado: "mal",
+            mensaje: "Mapcake no fue creado",
             datos: null,
           });
         } else {
@@ -25,10 +25,8 @@ const controladorCupcakes = {
             nombre: solicitud.body.nombre,
             sabor: solicitud.body.sabor,
             descripcion: solicitud.body.descripcion,
-            imagen: {
-              data: solicitud.file.filename,
-              contentType: "image/png",
-            },
+            precio: solicitud.body.precio,
+            imagen: solicitud.file.filename,
           });
           const mupcakeCreado = await nuevoMapcake.save();
           if (mupcakeCreado._id) {
@@ -50,11 +48,16 @@ const controladorCupcakes = {
   },
   leerMapcake: async (solicitud, respuesta) => {
     try {
-      respuesta.json({
-        resultado: "bien",
-        mensaje: "Mapcake leído",
-        datos: null,
-      });
+      const mapcakeEncontrado = await modeloCupcakes.findById(
+        solicitud.params.id
+      );
+      if (mapcakeEncontrado.id) {
+        respuesta.json({
+          resultado: "bien",
+          mensaje: "Mapcake leído",
+          datos: mapcakeEncontrado,
+        });
+      }
     } catch (error) {
       respuesta.json({
         resultado: "mal",
@@ -63,12 +66,13 @@ const controladorCupcakes = {
       });
     }
   },
-  leerMapcake: async (solicitud, respuesta) => {
+  leerMapcakes: async (solicitud, respuesta) => {
     try {
+      const todosLosMapcakes = await modeloCupcakes.find();
       respuesta.json({
         resultado: "bien",
         mensaje: "Mapcakes leídos",
-        datos: null,
+        datos: todosLosMapcakes,
       });
     } catch (error) {
       respuesta.json({
@@ -80,11 +84,17 @@ const controladorCupcakes = {
   },
   actualizarMapcake: async (solicitud, respuesta) => {
     try {
-      respuesta.json({
-        resultado: "bien",
-        mensaje: "Mapcake actualizado",
-        datos: null,
-      });
+      const mapcakeActualizado = await modeloCupcakes.findByIdAndUpdate(
+        solicitud.params.id,
+        solicitud.body
+      );
+      if (mapcakeActualizado._id) {
+        respuesta.json({
+          resultado: "bien",
+          mensaje: "Mapcake actualizado",
+          datos: mapcakeActualizado._id,
+        });
+      }
     } catch (error) {
       respuesta.json({
         resultado: "mal",
@@ -95,11 +105,17 @@ const controladorCupcakes = {
   },
   eliminarMapcake: async (solicitud, respuesta) => {
     try {
-      respuesta.json({
-        resultado: "bien",
-        mensaje: "Mapcake eliminado",
-        datos: null,
-      });
+      const mapcakeEliminado = await modeloCupcakes.findByIdAndDelete(
+        solicitud.params.id
+      );
+      if (mapcakeEliminado._id) {
+        await fs.unlink("imagenes/" + mapcakeEliminado.imagen);
+        respuesta.json({
+          resultado: "bien",
+          mensaje: "Mapcake eliminado",
+          datos: null,
+        });
+      }
     } catch (error) {
       respuesta.json({
         resultado: "mal",

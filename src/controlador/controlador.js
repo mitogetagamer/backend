@@ -3,7 +3,10 @@ import modelo from "../modelos/modelo.js";
 const ControladorUsuarios = {
   crearUsuario: async (solicitud, respuesta) => {
     try {
-      const { nombre, email, contrasenia } = solicitud.body;
+      const nombre = solicitud.body.nombre;
+      const email = solicitud.body.email;
+      const contrasenia = solicitud.body.contrasenia;
+
       const contraseniaProtegida = await bcrypt.hash(contrasenia, 10);
       const nuevoUser = new modelo({
         nombre,
