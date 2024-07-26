@@ -30,6 +30,8 @@ const controladorCupcakes = {
           });
           const mupcakeCreado = await nuevoMapcake.save();
           if (mupcakeCreado._id) {
+            console.log(solicitud.body);
+            console.log(solicitud.params.id);
             respuesta.json({
               resultado: "bien",
               mensaje: "El mapcake se creo correctamente",
@@ -84,14 +86,25 @@ const controladorCupcakes = {
   },
   actualizarMapcake: async (solicitud, respuesta) => {
     try {
+      const { id } = solicitud.params;
+
+      const updateData = {
+        nombre: solicitud.body.nombre,
+        precio: solicitud.body.precio,
+        descripcion: solicitud.body.descripcion,
+      };  
       const mapcakeActualizado = await modeloCupcakes.findByIdAndUpdate(
-        solicitud.params.id,
-        solicitud.body
+        id,
+        updateData,
+        { new: true }
       );
       if (mapcakeActualizado._id) {
+        console.log(solicitud.body);
+        console.log(solicitud.params.id);
+
         respuesta.json({
           resultado: "bien",
-          mensaje: "Mapcake actualizado",
+          mensaje: "Mapcake aactualizado",
           datos: mapcakeActualizado._id,
         });
       }

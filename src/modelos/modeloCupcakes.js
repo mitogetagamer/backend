@@ -5,7 +5,7 @@ const esquemaCupcakes = new Schema(
     nombre: { type: String, required: true },
     sabor: { type: String, required: false },
     descripcion: { type: String, required: false },
-    imagen: { type: String, required: true },
+    imagen: { type: String, required: false },
     precio: { type: Number, required: true },
   },
   { versionKey: false, timestamps: true }
